@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<head>
+	<script src="sprites/yzkgame.js"></script> 
+	<script src="node_modules/axios/dist/axios.min.js"></script>   
+	<script type="text/javascript">
+        function average(nums) {
+            return nums.reduce((a, b) => a + b) / nums.length;
+        }
+	    var frequencyData = new Uint8Array(10);
+        var analyser;
+		function renderVisualizer() {
+			requestAnimationFrame(renderVisualizer);
+			if (analyser) {
+				analyser.getByteFrequencyData(frequencyData);
+			}
+			let avg = average(frequencyData) / 100;
+			document.getElementById("img1").style.transform = 'scale(' + avg + ',' + avg + ')';
+			document.getElementById("img2").style.transform = 'scale(' + avg + ',' + avg + ')';
+		}	
+        function fileOnChange() {
+            var player = document.getElementById("player");
+            var file = document.getElementById("file");
+            var url = window.URL.createObjectURL(file.files[0]);
+            player.src = url;
+            player.play();
+            if (!analyser) {
+                //下面的代码必须运行在用户触发的事件中
+                var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                frequencyData = new Uint8Array(analyser.frequencyBinCount);
+                var audioSrc = audioCtx.createMediaElementSource(player);
+                audioSrc.connect(analyser);
+                audioSrc.connect(audioCtx.destination);
+            }
+        }			
+		window.onload=async function(){
+			renderVisualizer();
+			var canvas = document.getElementById("canvas");		
+			await initGameAsync();
+			await loadGameAsync(canvas);
+			createSprite(0,"yzk_dancer");
+			playSpriteAnimation(0,"LeftHandHoldPhone");		
+		}
+	</script>	
+</head>
+<body>
+    <input type="file" accept=".mp3,.m4a" id="file" onchange="fileOnChange()" />
+    <audio id="player" controls>
+    </audio>
+    <div>
+        <img id="img1" src="wxl.png" />
+        <img id="img2" src="yzk.png" />
+    </div>
+	<canvas id="canvas"></canvas>
+</body>
+</html>
