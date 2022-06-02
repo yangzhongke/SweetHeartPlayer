@@ -10,6 +10,7 @@
         function average(nums) {
             return nums.reduce((a, b) => a + b) / nums.length;
         }
+		var lastAmplitude=0,lastAnimationTick=0;		
 	    var frequencyData = new Uint8Array(10);
         var analyser;
 		function renderVisualizer() {
@@ -20,7 +21,20 @@
 			let avg = average(frequencyData) / 100;
 			document.getElementById("img1").style.transform = 'scale(' + avg + ',' + avg + ')';
 			document.getElementById("img2").style.transform = 'scale(' + avg + ',' + avg + ')';
+			if(Math.abs(avg-lastAmplitude)>0.3&&new Date().getTime()-lastAnimationTick>3000)
+			{
+			  lastAmplitude = avg;
+			  lastAnimationTick = new Date().getTime();
+			  randAnimation();
+			}			
 		}	
+		function randAnimation()
+		{
+			var aniNames = getSpriteManifest().filter(e=>e.name="yzk_dancer")[0].animations.map(e=>e.name);
+			var randIndex = Math.floor(Math.random() * aniNames.length);
+			var randAniName = aniNames[randIndex];
+			playSpriteAnimation(0,randAniName);	
+		}
         function fileOnChange() {
             var player = document.getElementById("player");
             var file = document.getElementById("file");
@@ -41,9 +55,10 @@
 			renderVisualizer();
 			var canvas = document.getElementById("canvas");		
 			await initGameAsync();
-			await loadGameAsync(canvas);
+			await loadGameAsync(canvas,10);
 			createSprite(0,"yzk_dancer");
 			playSpriteAnimation(0,"LeftHandHoldPhone");		
+			canvas.onclick=randAnimation;
 		}
 	</script>	
 </head>
@@ -53,8 +68,9 @@
     </audio>
     <div>
         <img id="img1" src="wxl.png" />
+		<canvas id="canvas"></canvas>
         <img id="img2" src="yzk.png" />
     </div>
-	<canvas id="canvas"></canvas>
+	
 </body>
 </html>

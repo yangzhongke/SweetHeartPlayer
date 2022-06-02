@@ -34,8 +34,12 @@ async function initGameAsync()
 	});
 }
 
-async function loadGameAsync(canvas)
+async function loadGameAsync(canvas,fps)
 {	
+    if(!fps)
+	{
+		fps=20;
+	}
 	setInterval(function(){
 		for(var i=0;i<spriteItems.length;i++)
 		{
@@ -48,7 +52,7 @@ async function loadGameAsync(canvas)
 			}
 			item.currentFrameIndex = currentFrameIndex;//更换为下一张			
 		}
-	},200);	
+	},1000/fps);	
 	let renderFrame=function()
 	{		
 		//对于canvas绘制来讲，requestAnimationFrame比setInterval性能更好
